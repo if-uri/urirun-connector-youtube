@@ -1,0 +1,19 @@
+[build-system]
+requires = ["setuptools>=61"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "urirun-connector-youtube"
+version = "0.1.0"
+description = "Headless YouTube access via yt-dlp: fetch transcript/captions, video metadata, and chapter-based highlights. No browser, no API key, no secrets."
+readme = "README.md"
+requires-python = ">=3.10"
+license = { text = "Apache-2.0" }
+authors = [{ name = "Tom Sapletta" }]
+dependencies = ["urirun>=0.4.14", "yt-dlp"]
+
+[project.entry-points."urirun.bindings"]
+youtube = "urirun_connector_youtube.core:urirun_bindings"
+
+[tool.setuptools.packages.find]
+include = ["urirun_connector_youtube*"]
