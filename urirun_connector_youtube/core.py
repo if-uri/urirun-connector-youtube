@@ -11,8 +11,10 @@ from typing import Any
 
 import urirun
 
+from . import _urirun_compat
+
 CONNECTOR_ID = "youtube"
-conn = urirun.connector(CONNECTOR_ID, scheme="youtube")
+conn = _urirun_compat.connector(CONNECTOR_ID, scheme="youtube")
 
 
 def _ok(**kw: Any) -> dict[str, Any]:
@@ -161,13 +163,32 @@ def highlights_query_extract(url: str = '', lang: str = 'en', max_items: int = 8
 def urirun_bindings() -> dict[str, Any]:
     return conn.bindings()
 
+@conn.handler("youtube://host/doctor/query/report", isolated=True, meta={"label": "Connector readiness report"})
+def doctor() -> dict[str, Any]:
+    """Return a safe, read-only connector readiness report for CI smoke tests."""
+    return {
+        "ok": True,
+        "connector": CONNECTOR_ID,
+        "version": _connector_version(),
+        "status": "ready",
+    }
+
+
+def _connector_version() -> str:
+    try:
+        from importlib.metadata import version
+
+        return version("urirun-connector-youtube")
+    except Exception:
+        return "0.1.0"
+
 
 def connector_manifest() -> dict[str, Any]:
-    return urirun.load_manifest(__package__) or {"id": CONNECTOR_ID}
+    return _urirun_compat.load_manifest(__package__) or {"id": CONNECTOR_ID}
 
 
 def main(argv: list[str] | None = None) -> int:
-    return conn.cli(argv, manifest_prose=urirun.load_manifest(__package__))
+    return conn.cli(argv, manifest_prose=_urirun_compat.load_manifest(__package__))
 
 
 if __name__ == "__main__":
